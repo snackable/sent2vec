@@ -1,7 +1,9 @@
 import sys
-from distutils.core import setup
+from setuptools import setup, dist, Extension
+
+dist.Distribution().fetch_build_eggs(['Cython>=0.15.1', 'numpy>=1.10'])
+
 from Cython.Build import cythonize
-from distutils.extension import Extension
 import numpy
 
 sourcefiles  = ['src/sent2vec.pyx',
