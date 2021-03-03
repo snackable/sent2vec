@@ -1,7 +1,7 @@
 import sys
 from setuptools import setup, dist, Extension
 
-dist.Distribution().fetch_build_eggs(['Cython>=0.15.1', 'numpy>=1.10'])
+dist.Distribution().fetch_build_eggs(['Cython>=0.29.13', 'numpy>=1.19.5'])
 
 from Cython.Build import cythonize
 import numpy
@@ -32,6 +32,6 @@ ext=[Extension('*',
 
 setup(
   name='sent2vec',
-  install_requires=['cython>=0.29.13', 'numpy>=1.17.1'],
+  install_requires=['cython>=0.29.13', 'numpy>=1.19.5'],
   ext_modules=cythonize(ext)
 )
