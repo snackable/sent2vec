@@ -33,5 +33,5 @@ ext=[Extension('*',
 setup(
   name='sent2vec',
   install_requires=['cython>=0.29.13', 'numpy>=1.19.5'],
-  ext_modules=cythonize(ext)
+  ext_modules=cythonize(ext, compiler_directives={'language_level' : "3"})
 )
