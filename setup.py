@@ -1,7 +1,7 @@
 import sys
 from setuptools import setup, dist, Extension
 
-dist.Distribution().fetch_build_eggs(['Cython>=0.29.13', 'numpy>=1.19.5'])
+dist.Distribution().fetch_build_eggs(['cython>=0.29.13', 'numpy>=1.19.5'])
 
 from Cython.Build import cythonize
 import numpy
