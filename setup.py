@@ -1,10 +1,23 @@
 import sys
 from setuptools import setup, dist, Extension
+from distutils.command.build import build as build_orig
 
-dist.Distribution().fetch_build_eggs(['cython>=0.29.13', 'numpy>=1.19.5'])
+class build(build_orig):
 
-from Cython.Build import cythonize
-import numpy
+    def finalize_options(self):
+        super().finalize_options()
+        import numpy
+        for extension in self.distribution.ext_modules:
+            extension.include_dirs.append(numpy.get_include())
+        from Cython.Build import cythonize
+        self.distribution.ext_modules = cythonize(self.distribution.ext_modules,
+                                                  language_level=3)
+
+
+
+
+#dist.Distribution().fetch_build_eggs(['cython>=0.29.13', 'numpy>=1.19.5'])
+
 
 sourcefiles  = ['src/sent2vec.pyx',
                 'src/fasttext.cc',
@@ -27,11 +40,12 @@ ext=[Extension('*',
             sourcefiles,
             extra_compile_args=compile_opts,
             language='c++',
-            include_dirs=[numpy.get_include()],
             libraries=libraries)]
 
 setup(
   name='sent2vec',
-  install_requires=['cython>=0.29.13', 'numpy>=1.19.5'],
-  ext_modules=cythonize(ext, compiler_directives={'language_level' : "3"})
+  setup_requires=['cython>=0.29.13', 'numpy>=1.19.5'],
+  install_requires=['numpy>=1.19.5'],
+  cmdclass={"build": build},
+  ext_modules=ext
 )
