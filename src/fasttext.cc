@@ -214,12 +214,16 @@ void FastText::loadModel(const std::string& filename,
     exit(EXIT_FAILURE);
   }
   if (inference_mode) {
+    std::cerr << "[DEBUG] Inference mode!" << std::endl;
     if (shared_mem_enabled) {
+      std::cerr << "[DEBUG] Shared memory enabled" << std::endl;
       loadModelWithSharedMemory(ifs, filename, timeout_sec);
     } else {
+      std::cerr << "[DEBUG] Not shared memory" << std::endl;
       loadModel(ifs, false);
     }
   } else {
+    std::cerr << "[DEBUG] Not inference mode" << std::endl;
     loadModel(ifs, true);
   }
   ifs.close();
@@ -232,36 +236,46 @@ void FastText::loadModel(std::istream& in, bool load_output_matrix /* = true */)
   output_ = std::make_shared<Matrix>();
   qinput_ = std::make_shared<QMatrix>();
   qoutput_ = std::make_shared<QMatrix>();
+  std::cerr << "[DEBUG] Loading args" << std::endl;
   args_->load(in);
-
+  std::cerr << "[DEBUG] Loading dict" << std::endl;
   dict_->load(in);
 
   bool quant_input;
+  std::cerr << "[DEBUG] Reading quant input" << std::endl;
   in.read((char*) &quant_input, sizeof(bool));
   if (quant_input) {
     quant_ = true;
+    std::cerr << "[DEBUG] Quant set" << std::endl;
     qinput_->load(in);
   } else {
+    std::cerr << "[DEBUG] Quant not sent" << std::endl;
     input_->load(in);
   }
 
   // Only load qoutput_ and output_ matrices if explicitly requested
   if (load_output_matrix) {
+      std::cerr << "[DEBUG] Loading output matrix" << std::endl;
       in.read((char*) &args_->qout, sizeof(bool));
       if (quant_ && args_->qout) {
+        std::cerr << "[DEBUG] Loading quant output matrix" << std::endl;
         qoutput_->load(in);
       } else {
+        std::cerr << "[DEBUG] Loading NON quant ooutput matrix" << std::endl;
         output_->load(in);
       }
   }
-
+  std::cerr << "[DEBUG] Making model" << std::endl;
   model_ = std::make_shared<Model>(input_, output_, args_, 0);
   model_->quant_ = quant_;
+  std::cerr << "[DEBUG] Setting quantized pointer" << std::endl;
   model_->setQuantizePointer(qinput_, qoutput_, args_->qout);
 
   if (args_->model == model_name::sup) {
+    std::cerr << "[DEBUG] Setting target count to label" << std::endl;
     model_->setTargetCounts(dict_->getCounts(entry_type::label));
   } else {
+    std::cerr << "[DEBUG] Setting target count to word" << std::endl;
     model_->setTargetCounts(dict_->getCounts(entry_type::word));
   }
 }
